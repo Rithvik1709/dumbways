@@ -706,7 +706,7 @@ process.env = {
   }
 
   document.getElementById("brag").addEventListener("click", async () => {
-    const text = `I found ${found.size}/${cards.length} dumb ways to ship and earned ${fmtMoney(total())} in (fake) bug bounties — rank: ${rank(found.size)}${game.start ? `, in ${clock(elapsed())}` : ""}. Can you beat it? ${location.href.split("#")[0]}`;
+    const text = `I found ${found.size}/${cards.length} dumb ways to ship and earned ${fmtMoney(total())} in (fake) bug bounties — rank: ${rank(found.size)}${game.start ? `, in ${clock(elapsed())}` : ""}. Can you beat it? ${location.href.split("#")[0]} via @Bngrithvik`;
     try { await navigator.clipboard.writeText(text); toast("📋 Copied: ", "your score"); }
     catch { prompt("Copy your score:", text); }
   });

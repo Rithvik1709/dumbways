@@ -667,3 +667,28 @@ mark { background-size: 0% 100%; background-repeat: no-repeat; animation: draw .
 /* card flash when jumped to from the board */
 .card.flash { animation: flash 1.4s var(--ease); }
 @keyframes flash { 0%, 40% { box-shadow: 0 0 0 4px var(--accent), var(--shadow-hover); } }
+
+/* ================= X / follow ================= */
+.x-btn {
+  display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 12px; border-radius: 99px;
+  font: 500 13px var(--sans); text-decoration: none; color: var(--text);
+  border: 1px solid var(--line); background: #fff; transition: border-color .2s, box-shadow .2s, transform .2s var(--ease);
+}
+.x-btn svg { width: 13px; height: 13px; }
+.x-btn:hover { border-color: var(--text); box-shadow: var(--shadow-card); transform: translateY(-1px); }
+.foot-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.x-follow {
+  display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 99px; text-decoration: none;
+  background: var(--text); color: #fff; font-size: 14px; box-shadow: 0 8px 20px -8px rgba(0,0,0,.45);
+  transition: transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.x-follow svg { width: 15px; height: 15px; }
+.x-follow b { color: var(--accent); font-weight: 600; }
+.x-follow .arrow { transition: transform .3s var(--ease); }
+.x-follow:hover { transform: translateY(-2px); box-shadow: 0 14px 28px -10px rgba(0,0,0,.5); }
+.x-follow:hover .arrow { transform: translateX(3px); }
+@media (max-width: 760px) {
+  .x-btn span { display: none; }
+  .x-btn { width: 34px; padding: 0; justify-content: center; }
+  .foot-right { align-items: flex-start; }
+}
