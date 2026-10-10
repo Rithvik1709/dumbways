@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dumb Ways to Ship</title>
+  <meta name="description" content="An interactive museum of vibe-coded software. Poke the apps, break them, learn what not to merge.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+  <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+  <div class="nav-wrap">
+    <nav class="nav" aria-label="Main">
+      <a class="logo" href="#top"><span class="logo-mark" aria-hidden="true"></span>Dumb Ways</a>
+      <div class="nav-links">
+        <a href="#exhibits">Exhibits</a>
+        <a href="#how">How it works</a>
+      </div>
+      <div class="nav-right">
+        <button class="nav-progress" id="boardBtn" type="button" aria-controls="board" aria-expanded="false" title="Open bounty board"><span class="nav-bounty" id="navBounty">$0</span><span class="sep"></span><i class="dot"></i><b id="navFound">0</b>/<span id="navTotal">0</span></button>
+        <a class="btn btn-primary btn-sm" href="#exhibits">Start exploiting</a>
+      </div>
+    </nav>
+  </div>
+
+  <header class="hero" id="top">
+    <div class="wrap hero-inner">
+      <a class="announce" href="#exhibits"><span class="announce-tag">New</span>7 fresh exhibits, including race conditions <span aria-hidden="true">→</span></a>
+      <h1>Dumb ways to <mark>ship.</mark><br><span class="dim">Built in a weekend.</span></h1>
+      <p class="lede">An interactive museum of vibe-coded software. Every app here works perfectly, right up until someone uses it. Poke them, break them, then go check your own code.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary" href="#exhibits">Start breaking things</a>
+        <a class="btn btn-glow" href="#how">How it works <span aria-hidden="true">→</span></a>
+      </div>
+      <p class="hero-note">No signup · Runs entirely in your browser · Nothing real gets hurt</p>
+    </div>
+
+    <div class="wrap">
+      <div class="stage">
+        <div class="term" role="img" aria-label="Animated terminal: an AI assistant builds a login page and leaves the password in the frontend">
+          <div class="term-bar">
+            <span class="lights"><i></i><i></i><i></i></span>
+            <span class="term-title">~/startup — vibe-session</span>
+            <span class="term-status"><i class="dot"></i>shipping</span>
+          </div>
+          <pre class="term-body" id="term"></pre>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section class="wrap stats" aria-label="At a glance">
+    <div><b id="statExhibits">0</b><span>live exhibits</span></div>
+    <div><b id="statCats">0</b><span>categories of regret</span></div>
+    <div><b data-count="0">0</b><span>real servers harmed</span></div>
+    <div><b>∞</b><span>"LGTM" comments</span></div>
+  </section>
+
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <span>git commit -m "LGTM 👍"</span><span>works on my machine</span><span>// TODO: security</span><span>ship it friday 5pm</span><span>remove debug logs (later)</span><span>temp fix (permanent)</span><span>who needs tests</span><span>it's just an MVP</span><span>the AI said it was fine</span><span>chmod 777 everything</span>
+      <span>git commit -m "LGTM 👍"</span><span>works on my machine</span><span>// TODO: security</span><span>ship it friday 5pm</span><span>remove debug logs (later)</span><span>temp fix (permanent)</span><span>who needs tests</span><span>it's just an MVP</span><span>the AI said it was fine</span><span>chmod 777 everything</span>
+    </div>
+  </div>
+
+  <section class="wrap section-head" id="exhibits">
+    <p class="eyebrow">The collection</p>
+    <h2 class="display">Nineteen <mark>apps.</mark> <span class="dim">Each one shipped to production with one small, catastrophic flaw. Find them all.</span></h2>
+  </section>
+
+  <div class="toolbar">
+    <div class="wrap toolbar-inner">
+      <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+      <div class="progress" aria-live="polite">
+        <span><b id="foundCount">0</b>/<b id="totalCount">0</b> found</span>
+        <div class="bar"><i id="bar"></i></div>
+        <button id="reset" class="link" type="button">Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="victory" class="wrap hidden">
+    <div class="victory">
+      <span class="trophy">🏆</span>
+      <div><b>Museum fully exploited.</b> <span class="dim">You found every dumb way. Please don't ship any of them.</span></div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="board" id="board" aria-label="Bounty board" aria-hidden="true" inert>
+    <div class="board-head">
+      <div>
+        <p class="eyebrow">Bounty board</p>
+        <p class="board-total" id="boardTotal">$0</p>
+        <p class="board-sub"><span id="boardRank">Tourist</span> · <span id="boardTimer">00:00</span></p>
+      </div>
+      <button class="board-close" id="boardClose" type="button" aria-label="Close bounty board">✕</button>
+    </div>
+    <div class="board-meter"><i id="boardBar"></i></div>
+    <div class="board-stats">
+      <div><b id="boardFound">0</b><span>exploited</span></div>
+      <div><b id="boardHints">0</b><span>hints used</span></div>
+      <div><b id="boardMax">$0</b><span>max bounty</span></div>
+    </div>
+    <ol class="board-list" id="boardList"></ol>
+    <div class="board-foot">
+      <button class="btn btn-primary btn-sm" id="brag" type="button">Copy my score</button>
+      <button class="link" id="boardReset" type="button">Reset progress</button>
+    </div>
+  </aside>
+
+  <main class="wrap grid">
+
+    <!-- 01 -->
+    <article class="card" data-id="otp">
+      <div class="card-head"><span class="num">#01</span><span class="tag">Auth</span><span class="badge">Exploited</span></div>
+      <h2>The Self-Delivering OTP</h2>
+      <p class="blurb">Two-factor authentication, except both factors are on your screen.</p>
+      <form class="demo" data-step="send">
+        <label>Phone number <input name="phone" type="tel" placeholder="+1 555 010 0199" required></label>
+        <button>Send OTP</button>
+      </form>
+      <form class="demo hidden" data-step="verify">
+        <p class="ok">📲 OTP sent to <b data-out="phone"></b></p>
+        <p class="debug">[DEBUG] otp = <code data-out="otp"></code> <span class="muted">// TODO remove before launch</span></p>
+        <label>Enter the 6-digit code <input name="otp" inputmode="numeric" maxlength="6" autocomplete="off"></label>
+        <button>Verify</button>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>The OTP is generated in the browser and printed on the page (and in the console). The whole point of a one-time code is that it arrives through a <em>different channel</em> you control. Generate and verify it on the server; never send it back in the response.</p>
+      </details>
+    </article>
+
+    <!-- 02 -->
+    <article class="card" data-id="taken">
+      <div class="card-head"><span class="num">#02</span><span class="tag">Auth</span><span class="badge">Exploited</span></div>
+      <h2>Password Already Taken</h2>
+      <p class="blurb">Usernames must be unique. So, apparently, must passwords.</p>
+      <form class="demo">
+        <label>Username <input name="user" value="new_user_42"></label>
+        <label>Password <input name="pass" type="password" placeholder="try: password123" required></label>
+        <button>Create account</button>
+        <div class="result"></div>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>To know a password is "taken", the app must compare it against everyone else's, which means passwords are stored in plain text (or unsalted). And it then tells you whose account it opens. Hash passwords with a slow, salted algorithm (bcrypt, scrypt, argon2) and never compare across users.</p>
+      </details>
+    </article>
+
+    <!-- 03 -->
+    <article class="card" data-id="clientauth">
+      <div class="card-head"><span class="num">#03</span><span class="tag">Auth</span><span class="badge">Exploited</span></div>
+      <h2>Login, Checked by the Browser</h2>
+      <p class="blurb">The backend was "out of scope for the MVP".</p>
+      <form class="demo">
+        <label>Username <input name="u" autocomplete="off"></label>
+        <label>Password <input name="p" type="password" autocomplete="off"></label>
+        <div class="row">
+          <button>Log in</button>
+          <button type="button" class="ghost" data-action="source">View source</button>
+        </div>
+        <pre class="code hidden" data-out="source">// login.js (shipped to every visitor)
+function login(u, p) {
+  if (u === "admin" &amp;&amp; p === "letmein123") {
+    window.location = "/admin";
+  }
+}</pre>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>Anything that runs in the browser can be read by the person using it. Credentials, checks and "secret" logic in frontend code are public. Authentication has to happen on a server that the user can't see or modify.</p>
+      </details>
+    </article>
+
+    <!-- 04 -->
+    <article class="card" data-id="apikey">
+      <div class="card-head"><span class="num">#04</span><span class="tag">Secrets</span><span class="badge">Exploited</span></div>
+      <h2>BizBot™ AI Assistant</h2>
+      <p class="blurb">Calls the AI provider straight from your browser. What could go wrong?</p>
+      <form class="demo">
+        <div class="chat" data-out="chat"><p class="bot">Hi! I'm BizBot. Ask me anything.</p></div>
+        <div class="row">
+          <input name="msg" placeholder="Type a message" autocomplete="off" aria-label="Message">
+          <button>Send</button>
+        </div>
+        <div class="tabs"><button type="button" class="ghost" data-action="network">DevTools › Network</button></div>
+        <pre class="code hidden" data-out="network"></pre>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>The request to the AI provider carries the company's secret API key, so anyone can open DevTools, copy it, and run up the bill. Keep provider keys on a server and have the browser talk to your own endpoint, with auth and rate limits.</p>
+      </details>
+    </article>
+
+    <!-- 05 -->
+    <article class="card" data-id="price">
+      <div class="card-head"><span class="num">#05</span><span class="tag">Payments</span><span class="badge">Exploited</span></div>
+      <h2>Name Your Own Price</h2>
+      <p class="blurb">The server trusts whatever price the checkout page sends it.</p>
+      <form class="demo">
+        <p class="product">⌨️ Clacky Pro Keyboard <b>$189.00</b></p>
+        <label>Request body (POST /api/checkout)
+          <textarea name="body" rows="3" spellcheck="false">{"item": "kb-01", "qty": 1, "price": 189}</textarea>
+        </label>
+        <button>Pay now</button>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>Prices, discounts and totals sent from the client are suggestions from a stranger. The server should look up the price itself from the item ID and calculate the total.</p>
+      </details>
+    </article>
+
+    <!-- 06 -->
+    <article class="card" data-id="idor">
+      <div class="card-head"><span class="num">#06</span><span class="tag">Access</span><span class="badge">Exploited</span></div>
+      <h2>Everyone's Invoices</h2>
+      <p class="blurb">You're logged in as customer #1041. Here's your invoice.</p>
+      <form class="demo">
+        <label class="urlbar">https://shop.example/api/invoices/<input name="id" value="1041" inputmode="numeric" aria-label="Invoice ID"></label>
+        <button>Go</button>
+        <div class="receipt" data-out="invoice"></div>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>This is an IDOR (insecure direct object reference). The server returns any invoice whose ID you ask for without checking it belongs to you. Every record lookup needs an ownership check, and sequential IDs make the problem easy to exploit.</p>
+      </details>
+    </article>
+
+    <!-- 07 -->
+    <article class="card" data-id="coupon">
+      <div class="card-head"><span class="num">#07</span><span class="tag">Payments</span><span class="badge">Exploited</span></div>
+      <h2>The Infinite Coupon</h2>
+      <p class="blurb">One coupon per customer. Per click.</p>
+      <form class="demo">
+        <p class="product">🧦 Artisanal Socks <b>$50.00</b></p>
+        <div class="row">
+          <input name="code" value="WELCOME10" aria-label="Coupon code">
+          <button>Apply</button>
+        </div>
+        <p>Total: <b data-out="total">$50.00</b></p>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>The coupon is never marked as used, and nothing stops the total going below zero. Redeem coupons on the server, record them per account and order, and clamp totals.</p>
+      </details>
+    </article>
+
+    <!-- 08 -->
+    <article class="card" data-id="admin">
+      <div class="card-head"><span class="num">#08</span><span class="tag">Access</span><span class="badge">Exploited</span></div>
+      <h2>Admin by Query String</h2>
+      <p class="blurb">Role-based access control, where the role is in the URL.</p>
+      <form class="demo">
+        <label class="urlbar">https://app.example/dashboard?<input name="qs" value="isAdmin=false" aria-label="Query string"></label>
+        <button>Go</button>
+        <div class="panel" data-out="dash"></div>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>Permissions must come from the server-side session, not from anything the user can type: URLs, cookies they can edit, localStorage, or hidden form fields.</p>
+      </details>
+    </article>
+
+    <!-- 09 -->
+    <article class="card" data-id="sqli">
+      <div class="card-head"><span class="num">#09</span><span class="tag">Injection</span><span class="badge">Exploited</span></div>
+      <h2>User Search, Lovingly Concatenated</h2>
+      <p class="blurb">The query is built with string templates. It's so readable!</p>
+      <form class="demo">
+        <div class="row">
+          <input name="q" placeholder="Search by name, e.g. alice" autocomplete="off" aria-label="Search">
+          <button>Search</button>
+        </div>
+        <pre class="code" data-out="sql">SELECT * FROM users WHERE name = '';</pre>
+        <div class="table" data-out="rows"></div>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>Pasting user input into SQL lets the input <em>become</em> SQL. Try <code>' OR '1'='1</code>. Always use parameterized queries or an ORM's bound parameters.</p>
+      </details>
+    </article>
+
+    <!-- 10 -->
+    <article class="card" data-id="xss">
+      <div class="card-head"><span class="num">#10</span><span class="tag">Injection</span><span class="badge">Exploited</span></div>
+      <h2>The Trusting Guestbook</h2>
+      <p class="blurb">Comments support "rich formatting" via <code>innerHTML</code>.</p>
+      <form class="demo">
+        <div class="comments" data-out="comments">
+          <p><b>dave:</b> great site!!</p>
+        </div>
+        <div class="row">
+          <input name="c" placeholder="Leave a comment (HTML welcome!)" autocomplete="off" aria-label="Comment">
+          <button>Post</button>
+        </div>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>Rendering user content as HTML lets anyone run scripts in every visitor's browser, stealing sessions or acting as them. (This demo only simulates it.) Render text with <code>textContent</code>, or sanitize with a library like DOMPurify.</p>
+      </details>
+    </article>
+
+    <!-- 11 -->
+    <article class="card" data-id="stack">
+      <div class="card-head"><span class="num">#11</span><span class="tag">Secrets</span><span class="badge">Exploited</span></div>
+      <h2>Very Helpful Error Messages</h2>
+      <p class="blurb">Debug mode was on in prod "just for a day" (eight months ago).</p>
+      <form class="demo">
+        <label>Join our newsletter <input name="email" placeholder="you@example.com" autocomplete="off"></label>
+        <button>Subscribe</button>
+        <pre class="code err hidden" data-out="trace"></pre>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>Stack traces reveal file paths, library versions and, all too often, environment variables with credentials. Show users a generic error, log the details on the server, and keep secrets out of anything that could be printed.</p>
+      </details>
+    </article>
+
+    <!-- 12 -->
+    <article class="card" data-id="trial">
+      <div class="card-head"><span class="num">#12</span><span class="tag">Business logic</span><span class="badge">Exploited</span></div>
+      <h2>The Eternal Free Trial</h2>
+      <p class="blurb">Your trial has ended. Please upgrade to Pro for $49/mo.</p>
+      <form class="demo">
+        <p class="panel locked" data-out="status">🔒 Pro features locked. Trial expired.</p>
+        <label>DevTools › Application › Local Storage › <code>trial_expires</code>
+          <input name="exp" value="2026-01-01" spellcheck="false">
+        </label>
+        <button>Reload page</button>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>The trial's expiry date lives in the user's own browser, so they can just change it. Subscription and trial state belong in your database, checked on every request that uses a paid feature.</p>
+      </details>
+    </article>
+
+    <!-- 13 -->
+    <article class="card" data-id="brute">
+      <div class="card-head"><span class="num">#13</span><span class="tag">Auth</span><span class="badge">Exploited</span></div>
+      <h2>The Unlimited PIN Pad</h2>
+      <p class="blurb">A 4-digit PIN protects your vault. Attempts: unlimited.</p>
+      <form class="demo">
+        <label>Vault PIN <input name="pin" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"></label>
+        <div class="row">
+          <button>Unlock</button>
+          <button type="button" class="ghost" data-action="brute">Run brute-force script</button>
+        </div>
+        <pre class="code hidden" data-out="log"></pre>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>There are only 10,000 four-digit PINs, so without rate limiting a script tries them all in seconds. Limit attempts per account and IP, add delays or lockouts, and use longer secrets.</p>
+      </details>
+    </article>
+
+    <!-- 14 -->
+    <article class="card" data-id="reset">
+      <div class="card-head"><span class="num">#14</span><span class="tag">Auth</span><span class="badge">Exploited</span></div>
+      <h2>Password Reset, Hand-Delivered</h2>
+      <p class="blurb">The reset link is emailed to the owner. And returned to whoever asked.</p>
+      <form class="demo" data-step="request">
+        <label>Forgot password? Enter any email <input name="email" value="ceo@bigcorp.example" autocomplete="off"></label>
+        <button>Send reset link</button>
+        <pre class="code hidden" data-out="resp"></pre>
+      </form>
+      <form class="demo hidden" data-step="set">
+        <label>Reset token <input name="token" autocomplete="off" spellcheck="false"></label>
+        <label>New password <input name="pw" type="password" autocomplete="off"></label>
+        <button>Set new password</button>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>The API response includes the reset token, so anyone can reset anyone's password without access to their inbox. Only deliver tokens through the email channel, make them single-use and short-lived, and return the same response whether or not the account exists.</p>
+      </details>
+    </article>
+
+    <!-- 15 -->
+    <article class="card" data-id="cookie">
+      <div class="card-head"><span class="num">#15</span><span class="tag">Access</span><span class="badge">Exploited</span></div>
+      <h2>The Honour-System Session</h2>
+      <p class="blurb">The session cookie is just base64. No signature, because "it's encoded".</p>
+      <form class="demo">
+        <label>Cookie: session=
+          <input name="raw" data-out="raw" spellcheck="false" readonly>
+        </label>
+        <label>Decoded (editable)
+          <textarea name="json" rows="2" spellcheck="false">{"user": "guest_7781", "role": "user"}</textarea>
+        </label>
+        <button>Save cookie &amp; reload</button>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>Encoding is not encryption, and neither one stops tampering. Sessions should be an opaque random ID looked up on the server, or a token signed with a secret key (and the signature actually verified).</p>
+      </details>
+    </article>
+
+    <!-- 16 -->
+    <article class="card" data-id="float">
+      <div class="card-head"><span class="num">#16</span><span class="tag">Payments</span><span class="badge">Exploited</span></div>
+      <h2>Floating-Point Finance</h2>
+      <p class="blurb">Money is stored as a JavaScript number. Accountants, look away.</p>
+      <form class="demo">
+        <p class="product">🍬 Gumball <b>$0.10</b></p>
+        <p class="product">🍭 Lollipop <b>$0.20</b></p>
+        <p>Total: <b data-out="total">$0.30000000000000004</b></p>
+        <label>Pay amount <input name="pay" value="0.30" inputmode="decimal"></label>
+        <button>Pay</button>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>Binary floating point can't represent 0.1 exactly, so <code>0.1 + 0.2 !== 0.3</code>. Store money as integer cents (or use a decimal type) and only format it for display.</p>
+      </details>
+    </article>
+
+    <!-- 17 -->
+    <article class="card" data-id="upload">
+      <div class="card-head"><span class="num">#17</span><span class="tag">Injection</span><span class="badge">Exploited</span></div>
+      <h2>Upload Anything™</h2>
+      <p class="blurb">Profile pictures are saved with their original name, in a public folder.</p>
+      <form class="demo">
+        <label>Filename to upload <input name="file" value="me.jpg" spellcheck="false" autocomplete="off"></label>
+        <button>Upload avatar</button>
+        <div class="panel" data-out="out"></div>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>Accepting any file type and serving it from your domain lets attackers upload scripts, HTML pages or executables. Check the real file contents (not only the extension), rename files, and serve uploads from a separate domain with safe headers.</p>
+      </details>
+    </article>
+
+    <!-- 18 -->
+    <article class="card" data-id="robots">
+      <div class="card-head"><span class="num">#18</span><span class="tag">Secrets</span><span class="badge">Exploited</span></div>
+      <h2>Security Through robots.txt</h2>
+      <p class="blurb">The admin panel is hidden. Search engines were asked very politely not to look.</p>
+      <form class="demo">
+        <label class="urlbar">https://startup.example/<input name="path" value="" placeholder="try robots.txt" aria-label="Path"></label>
+        <button>Go</button>
+        <pre class="code hidden" data-out="page"></pre>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>robots.txt is public, and listing "secret" paths there is a map for attackers. Hidden URLs aren't access control; protect admin pages with real authentication.</p>
+      </details>
+    </article>
+
+    <!-- 19 -->
+    <article class="card" data-id="race">
+      <div class="card-head"><span class="num">#19</span><span class="tag">Business logic</span><span class="badge">Exploited</span></div>
+      <h2>Check, Then (Eventually) Spend</h2>
+      <p class="blurb">Withdrawals check your balance first. Then wait a moment. Then withdraw.</p>
+      <form class="demo">
+        <p>Balance: <b data-out="balance">$100.00</b></p>
+        <div class="row">
+          <button>Withdraw $100</button>
+          <button type="button" class="ghost" data-action="reset">Reset</button>
+        </div>
+        <p class="muted">Hint: what if you click really fast?</p>
+        <p class="result"></p>
+      </form>
+      <details><summary>What's wrong here?</summary>
+        <p>This is a race condition: several requests all pass the balance check before any of them deducts. Do the check and the update atomically, for example in one database transaction with a row lock, or a conditional update like <code>UPDATE … WHERE balance &gt;= 100</code>.</p>
+      </details>
+    </article>
+
+  </main>
+
+  <section class="wrap how" id="how">
+    <p class="eyebrow">How it works</p>
+    <h2 class="display">Three <mark>steps.</mark> <span class="dim">Roughly the same three steps an attacker takes.</span></h2>
+    <div class="how-grid">
+      <div><span class="step">01</span><h3>Poke</h3><p>Every card is a tiny working app. Use it like a normal person would. Sign up, check out, leave a comment.</p></div>
+      <div><span class="step">02</span><h3>Break</h3><p>Now use it like a curious one. Edit the request, change the URL, click faster. When it breaks, the card gets stamped.</p></div>
+      <div><span class="step">03</span><h3>Learn</h3><p>Open "What's wrong here?" for the real fix. Then search your own codebase for the same pattern. We'll wait.</p></div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div class="wrap foot-inner">
+      <p>Made to be laughed at, then learned from. If your app does any of these, that's fine. Just fix it before someone else finds it.</p>
+      <p class="mono">Everything here is fake and runs in your browser.</p>
+    </div>
+    <div class="wordmark" aria-hidden="true">DUMB WAYS</div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
